@@ -13,15 +13,17 @@ document.addEventListener("DOMContentLoaded", function (event) {
         spacedPointName = namePlanet.createSpacedPointsGeometry(128);
         spacedPointName.rotateX(THREE.Math.degToRad(-90));
         orbitName = new THREE.Line(spacedPointName, new THREE.LineBasicMaterial({
-            color: 0x263238
+            color: 0x191818
         }));
         orbitName.position.set(0, 50, 0);
         scene.add(orbitName);
     }
     function drawPlanet(geoPlanet, matPlanet, posX, colorP, widthPlanet, meshPlanet, meshPlanetRotation, theta = 0, dTheta, r, rings = false) {
-        geoPlanet = new THREE.IcosahedronBufferGeometry(widthPlanet, 0);
+        //geoPlanet = new THREE.IcosahedronBufferGeometry(widthPlanet, 0);
+        geoPlanet = new THREE.SphereGeometry(widthPlanet, 32, 8,);
         matPlanet = new THREE.MeshPhongMaterial({
             flatShading: false,
+            //map: new THREE.ImageUtils.loadTexture("./image/earth_3.jpg"),
             shininess: 100,
             color: colorP
         });
@@ -33,15 +35,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
         function animatePlanet() {
             meshPlanet.rotation.y += meshPlanetRotation;
             //Orbit of planet
-            theta +=  2 * Math.PI / dTheta;
+            theta += 2 * Math.PI / dTheta;
             meshPlanet.position.x = r * Math.cos(theta);
             meshPlanet.position.z = r * Math.sin(theta);
             requestAnimationFrame(animatePlanet);
         }
-        if(rings) {
+        if (rings) {
             let geoRing = new THREE.RingGeometry(25, 20, 30, 1, 3, 6.3);
-            let matRing= new THREE.MeshPhongMaterial({ color: colorP, side: THREE.DoubleSide });
-            let meshRing= new THREE.Mesh(geoRing, matRing);
+            let matRing = new THREE.MeshPhongMaterial({ color: colorP, side: THREE.DoubleSide });
+            let meshRing = new THREE.Mesh(geoRing, matRing);
             meshRing.rotation.x = (Math.PI / 2) + 0.1;
             meshRing.position.set(0, 0, 0);
             meshRing.castShadow = true;
@@ -54,12 +56,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-        renderer.gammaInput = true;
-        renderer.gammaOutput = true;
-
+        
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000);
@@ -68,15 +65,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
         let controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.addEventListener('change', render);
         controls.minDistance = 100;
-        //controls.maxDistance = 500;
         controls.enablePan = false;
         controls.rotateSpeed = 0.1;
         controls.dampingFactor = 0.1;
         controls.update();
 
         // lumiere 
-        spotLight = new THREE.SpotLight(0xffffff, 0.5);
-        spotLight.position.set(15, 60, 35);
+        spotLight = new THREE.SpotLight(0xffffff, 2);
+        spotLight.position.set(-200, 0, 0);
         spotLight.angle = Math.PI / 4;
         spotLight.penumbra = 1;
         spotLight.decay = 1;
@@ -107,28 +103,29 @@ document.addEventListener("DOMContentLoaded", function (event) {
         drawPlanet(geoMercure, matMercure, 30, 0x546E7A, 5, meshMercure, 0.0053005857740586, 0, 241.09589041096, 30);
         drawOrbit("shapeMercure", "spacedPointsMercure", 30, "ffffff", "orbitMercure");
 
-        drawPlanet(geoVenus, matVenus, 60,0xF57C00, 10, meshVenus, 0.0021962410041841, 0, 613.69863013699, 60);
+        drawPlanet(geoVenus, matVenus, 60, 0xF57C00, 10, meshVenus, 0.0021962410041841, 0, 613.69863013699, 60);
         drawOrbit("shapeVenus", "spacedPointsVenus", 60, "ffffff", "orbitVenus");
 
-        drawPlanet(geoEarth, matEarth, 100,0x27ae60, 10, meshEarth, 0.0091, 0, 1000, 100);
+        drawPlanet(geoEarth, matEarth, 100, 0x27ae60, 10, meshEarth, 0.0091, 0, 1000, 100);
+ 
         drawOrbit("shapeEarth", "spacedPointsEarth", 100, 0x263238, "orbitEarth");
-  
-        drawPlanet(geoMars, matMars, 130,0xe74c3c, 8, meshMars, 0.0091, 0, 1879.4520547945, 130);
+
+        drawPlanet(geoMars, matMars, 130, 0xe74c3c, 8, meshMars, 0.0091, 0, 1879.4520547945, 130);
         drawOrbit("shapeMars", "spacedPointsMars", 130, "ffffff", "orbitMars");
 
-        drawPlanet(geoJupiter, matJupiter, 160,0xe67e22, 13, meshJupiter, 0.0037058158995816, 0,  11868.493150685, 160, true);
+        drawPlanet(geoJupiter, matJupiter, 160, 0xe67e22, 13, meshJupiter, 0.0037058158995816, 0, 11868.493150685, 160, true);
         drawOrbit("shapeJupiter", "spacedPointsJupiter", 160, "37474F", "orbitJupiter");
 
-        drawPlanet(geoSaturne, matSaturne, 200,0xf1c40f, 12, meshSaturne,0.0038534309623431, 0, 29476.712328767, 200, true);
+        drawPlanet(geoSaturne, matSaturne, 200, 0xf1c40f, 12, meshSaturne, 0.0038534309623431, 0, 29476.712328767, 200, true);
         drawOrbit("shapeSaturne", "spacedPointsSaturne", 200, "ffffff", "orbitSaturne");
 
-        drawPlanet(geoUranus, matUranus, 230,0x3498db, 11, meshUranus,0.0067405857740586, 0, 84076.712328767, 230);
+        drawPlanet(geoUranus, matUranus, 230, 0x3498db, 11, meshUranus, 0.0067405857740586, 0, 84076.712328767, 230);
         drawOrbit("shapeUranus", "spacedPointsUranus", 230, "ffffff", "orbitUranus");
 
-        drawPlanet(geoNeptune, matNeptune, 260,0x2980b9, 10, meshNeptune,0.0057723514644351, 0, 164879.45205479, 260);
+        drawPlanet(geoNeptune, matNeptune, 260, 0x2980b9, 10, meshNeptune, 0.0057723514644351, 0, 164879.45205479, 260);
         drawOrbit("shapeNeptune", "spacedPointsNeptune", 260, "ffffff", "orbitNeptune");
 
-        drawPlanet(geoPluton, matPluton, 280,0x34495e, 5, meshPluton,0.0072301255230126, 0,  247860.2739726, 280);
+        drawPlanet(geoPluton, matPluton, 280, 0x34495e, 5, meshPluton, 0.0072301255230126, 0, 247860.2739726, 280);
         drawOrbit("shapePluton", "spacedPointsPluton", 280, "ffffff", "orbitPluton");
 
         particles = new THREE.Group();
@@ -136,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const geoParticles = new THREE.SphereGeometry(0.4, 32, 32);
 
         for (let i = 0; i < 1000; i++) {
-           //const geoParticles = new THREE.SphereGeometry(0.4, 32, 32);
+            //const geoParticles = new THREE.SphereGeometry(0.4, 32, 32);
             const matParticles = new THREE.MeshPhongMaterial({
                 color: 0xFFFfFF
             });
@@ -148,20 +145,21 @@ document.addEventListener("DOMContentLoaded", function (event) {
             meshParticles.matrixAutoUpdate = false;
             particles.add(meshParticles);
             function animateParticles() {
-              let thetaPa = 0;
-              particles.rotation.y += 0.00000005;
-              //Orbit of planet
-              thetaPa +=  2 * Math.PI / 11868.493150685;
-              meshParticles.position.x = 1 * Math.cos(thetaPa);
-              meshParticles.position.z = 1 * Math.sin(thetaPa);
-              requestAnimationFrame(animateParticles);
+                let thetaPa = 0;
+                particles.rotation.y += 0.00000005;
+                //Orbit of planet
+                thetaPa += 2 * Math.PI / 11868.493150685;
+                meshParticles.position.x = 1 * Math.cos(thetaPa);
+                meshParticles.position.z = 1 * Math.sin(thetaPa);
+                requestAnimationFrame(animateParticles);
             }
-           animateParticles();
+            animateParticles();
         }
 
         //ciel dégradé
         const skylight = new THREE.HemisphereLight(0xFfFfFf, 0x263238, 1);
         scene.add(skylight);
+
         window.addEventListener('resize', onResize, false);
     }
 
@@ -177,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     function animate() {
         meshSun.rotation.y += 0;
-  
+
         requestAnimationFrame(animate);
         render();
     }
@@ -185,8 +183,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     init();
     animate();
     render();
-
-   
-  //https://codepen.io/clindsey/pen/dgpdWV?editors=0010
-  //https://codepen.io/nikita_ska/full/bqNdBj
+    
+    //https://codepen.io/clindsey/pen/dgpdWV?editors=0010
+    //https://codepen.io/nikita_ska/full/bqNdBj
 });
