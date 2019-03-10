@@ -20,20 +20,36 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
     function drawPlanet(geoPlanet, matPlanet, posX, colorP, widthPlanet, meshPlanet, meshPlanetRotation, theta = 0, dTheta, r, rings = false) {
         //geoPlanet = new THREE.IcosahedronBufferGeometry(widthPlanet, 0);
-        geoPlanet = new THREE.SphereGeometry(widthPlanet, 32, 8,);
+        geoPlanet = new THREE.DodecahedronGeometry(widthPlanet, 1);
         matPlanet = new THREE.MeshPhongMaterial({
-            flatShading: false,
+            shading: THREE.FlatShading,
             //map: new THREE.ImageUtils.loadTexture("./image/earth_3.jpg"),
-            shininess: 100,
+            shininess: 10,
             color: colorP
         });
         meshPlanet = new THREE.Mesh(geoPlanet, matPlanet);
         meshPlanet.position.set(posX, 50, 0);
         meshPlanet.castShadow = true;
         scene.add(meshPlanet);
+
+        let matPlanet2 = new THREE.MeshPhongMaterial({
+            color: colorP,
+            wireframe: true,
+            side: THREE.DoubleSide
+
+        });
+        var geoPlanet2 = new THREE.SphereGeometry(widthPlanet + 2, 8, 6);
+        meshPlanet2 = new THREE.Mesh(geoPlanet2, matPlanet2);
+        meshPlanet2.position.set(0, 0, 0);
+        meshPlanet2.castShadow = true;
+        meshPlanet.add(meshPlanet2);
+
+
         drawOrbit("shapeMercure", "spacedPointsMercure", 30, "ffffff", "orbitMercure");
         function animatePlanet() {
             meshPlanet.rotation.y += meshPlanetRotation;
+            meshPlanet2.rotation.z += 0.0005;
+            meshPlanet2.rotation.x -= 0.0005;
             //Orbit of planet
             theta += 2 * Math.PI / dTheta;
             meshPlanet.position.x = r * Math.cos(theta);
@@ -42,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         }
         if (rings) {
             let geoRing = new THREE.RingGeometry(25, 20, 30, 1, 3, 6.3);
-            let matRing = new THREE.MeshPhongMaterial({ color: colorP, side: THREE.DoubleSide });
+            let matRing = new THREE.MeshPhongMaterial({ color: colorP, wireframe: true, shading: THREE.FlatShading });
             let meshRing = new THREE.Mesh(geoRing, matRing);
             meshRing.rotation.x = (Math.PI / 2) + 0.1;
             meshRing.position.set(0, 0, 0);
@@ -56,22 +72,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-        
+
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000);
-        camera.position.set(0, 100, -400);
+        camera.position.set(0, 100, -200);
 
         let controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.addEventListener('change', render);
-        controls.minDistance = 100;
+        controls.minDistance = 50;
         controls.enablePan = false;
         controls.rotateSpeed = 0.1;
         controls.dampingFactor = 0.1;
         controls.update();
 
         // lumiere 
-        spotLight = new THREE.SpotLight(0xffffff, 2);
+        spotLight = new THREE.SpotLight(0xffffff, 1);
         spotLight.position.set(-200, 0, 0);
         spotLight.angle = Math.PI / 4;
         spotLight.penumbra = 1;
@@ -91,14 +107,29 @@ document.addEventListener("DOMContentLoaded", function (event) {
         //scene.add( new THREE.AxesHelper( 100 ) );
         /// Sun
         matSun = new THREE.MeshPhongMaterial({
-            flatShading: false,
-            shininess: 100, color: 0xFFA726
+            shininess: 50,
+            color: 0xf39c12,
+            shading: THREE.FlatShading
         });
-        geoSun = new THREE.SphereGeometry(15, 32, 32);
+        geoSun = new THREE.DodecahedronGeometry(15, 1);
         meshSun = new THREE.Mesh(geoSun, matSun);
         meshSun.position.set(0, 50, 0);
         meshSun.castShadow = true;
         scene.add(meshSun);
+
+
+        var mat2 = new THREE.MeshPhongMaterial({
+            color: 0xf39c12,
+            wireframe: true,
+            side: THREE.DoubleSide
+
+        });
+        geoSun2 = new THREE.SphereGeometry(20, 8, 6);
+        meshSun2 = new THREE.Mesh(geoSun2, mat2);
+        meshSun2.position.set(0, 50, 0);
+        meshSun2.castShadow = true;
+        scene.add(meshSun2);
+
 
         drawPlanet(geoMercure, matMercure, 30, 0x546E7A, 5, meshMercure, 0.0053005857740586, 0, 241.09589041096, 30);
         drawOrbit("shapeMercure", "spacedPointsMercure", 30, "ffffff", "orbitMercure");
@@ -107,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         drawOrbit("shapeVenus", "spacedPointsVenus", 60, "ffffff", "orbitVenus");
 
         drawPlanet(geoEarth, matEarth, 100, 0x27ae60, 10, meshEarth, 0.0091, 0, 1000, 100);
- 
+
         drawOrbit("shapeEarth", "spacedPointsEarth", 100, 0x263238, "orbitEarth");
 
         drawPlanet(geoMars, matMars, 130, 0xe74c3c, 8, meshMars, 0.0091, 0, 1879.4520547945, 130);
@@ -174,7 +205,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 
     function animate() {
-        meshSun.rotation.y += 0;
+        meshSun.rotation.y += 0.005;
+        meshSun.rotation.z += 0.005;
+        meshSun2.rotation.y += 0.005;
+        meshSun2.rotation.x -= 0.007;
 
         requestAnimationFrame(animate);
         render();
@@ -183,7 +217,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
     init();
     animate();
     render();
-    
-    //https://codepen.io/clindsey/pen/dgpdWV?editors=0010
-    //https://codepen.io/nikita_ska/full/bqNdBj
+
 });
+
+//http://davidscottlyons.com/threejs-intro/#slide-115
+  //https://codepen.io/clindsey/pen/dgpdWV?editors=0010
+  //https://codepen.io/nikita_ska/full/bqNdBj
+  //https://mattloftus.github.io/2016/02/03/threejs-p2/
+  //https://codepen.io/vcomics/pen/ZwNgvX?editors=0010
+  //https://codepen.io/murdoc/pen/aOPaqZ?editors=0010
